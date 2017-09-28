@@ -23,7 +23,8 @@ public class Chapter1 {
 			System.out.print(fib3(i)+"\t");
 		}
 		System.out.println();
-		System.out.println(countChange(10));
+		System.out.println(countChange(15));
+		//System.out.println(countChange2(10));
 		
 	}
 	
@@ -81,19 +82,39 @@ public class Chapter1 {
 	
 	//换零钱
 	public static int countChange(int mount){
-		return cc(mount,5);
+		return cc(mount,5,"");
 	}
 
 	/**
 	 * @param mount 整钱数量
 	 * @param coinKinds 零钱类型数量
 	 */
-	private static int cc(int mount, int coinKinds) {
-		if(mount == 0 ) return 1;
+	private static int cc(int mount, int coinKinds,String str) {
+		if(mount == 0 ) {
+			format2(str);
+			return 1;
+		}
 		if(mount<=0 || coinKinds == 0) return 0;
 		
-		return cc(mount,coinKinds - 1) + cc(mount - denomination(coinKinds),coinKinds);
+		return cc(mount,coinKinds - 1,str) + cc(mount - denomination(coinKinds),coinKinds,str += "," + coinKinds);
 	}
+	
+	private static void format2(String str) {
+		String[] ds = str.split(",");
+		int[] dCount = new int[6];
+		for(String dStr :ds){
+			if(dStr==null || dStr.equals("")) continue;
+			dCount[Integer.parseInt(dStr)]++;
+		}
+		String res = "";
+		for(int i = 1;i<dCount.length;i++){
+			if(dCount[i]==0) continue;
+			res += " (" + denomination(i) +"x"+dCount[i]  + ") +" ;
+		}
+		if(res.length()>0) res = res.substring(0,res.length() - 1);
+		System.out.println(res);
+	}
+
 	private static int denomination(int coinKind){
 		switch(coinKind){
 		case 1:return 1;
@@ -102,5 +123,46 @@ public class Chapter1 {
 		case 4: return 20;
 		default: return 50;
 		}
+	}
+	
+	private static int countChange2(int mount){
+		int count = 0;
+		int d1 = denomination(1);
+		int d2 = denomination(2);
+		int d3 = denomination(3);
+		int d4 = denomination(4);
+		int d5 = denomination(5);
+		for(int i=0;i*d1<=mount;i++){
+			for(int j=0;j*d2<=mount;j++){
+				for(int k=0;k*d3<=mount;k++){
+					for(int l=0;l*d4<=mount;l++){
+						for(int m=0;m*d5<=mount;m++){
+							int test = i * d1 
+									 + j * d2
+									 + k * d3
+									 + l * d4
+									 + m * d5;
+							if(test==mount){
+								String str = format(d1,i);
+								str += format(d2,j);
+								str += format(d3,k);
+								str += format(d4,l);
+								str += format(d5,m);
+								str = str.substring(0,str.length() - 1);
+								System.out.println(str);
+								count++;
+							}
+						}
+					}
+				}	
+			}
+		}
+		return count;
+	}
+	private static String format(int d,int count){
+		if(count==0){
+			return "";
+		}
+		return " ("+d + "x" + count + ") +";
 	}
 }
